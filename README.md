@@ -59,6 +59,7 @@
 
 ## Integration Events vs Domain Events
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/multi-container-microservice-net-applications/integration-event-based-microservice-communications
+* https://blogs.msdn.microsoft.com/cesardelatorre/2017/02/07/domain-events-vs-integration-events-in-domain-driven-design-and-microservices-architectures/
 * Semantically, domain and integration events are the same thing: notifications about something that just happened. However, their implementation must be different. Domain events are just messages pushed to a domain event dispatcher, which could be implemented as an in-memory mediator based on an IoC container or any other method.
 * On the other hand, the purpose of integration events is to propagate committed transactions and updates to additional subsystems, whether they are other microservices, Bounded Contexts or even external applications. Hence, they should occur only if the entity is successfully persisted, otherwise it's as if the entire operation never happened.
 * Integration events must be based on asynchronous communication between multiple microservices (other Bounded Contexts) or even external systems/applications.
@@ -67,8 +68,15 @@
 * The integration events can be defined at the application level of each microservice, so they are decoupled from other microservices, in a way comparable to how ViewModels are defined in the server and client. What is not recommended is sharing a common integration events library across multiple microservices; doing that would be coupling those microservices with a single event definition data library. You do not want to do that for the same reasons that you do not want to share a common domain model across multiple microservices: microservices must be completely autonomous.
 * The purpose of the Publish/Subscribe pattern is the same as the Observer pattern: you want to notify other services when certain events take place. But there is an important difference between the Observer and Pub/Sub patterns. In the observer pattern, the broadcast is performed directly from the observable to the observers, so they “know” each other. But when using a Pub/Sub pattern, there is a third component, called broker or message broker or event bus, which is known by both the publisher and subscriber. Therefore, when using the Pub/Sub pattern the publisher and the subscribers are precisely decoupled thanks to the mentioned event bus or message broker.
 * Because of that asynchronous communication, you should not publish integration events until you are 100% sure that your original operation, the event, really happened in the past. That means it was persisted in a database or any durable system. If you don’t do that, you can end up with inconsistent information across multiple microservices, bounded-contexts or external applications.
+* Of course, you might want to propagate some Domain Events to other microservices or bounded-contexts. The point is that you’d convert the domain event to an integration event (or aggregate multiple domain events into a single integration event) and publish it to the outside world after making sure that the original transaction is committed, after “it really happened” in the past in your original system, which is the real definition of an event.
 
 ![alt text](img/integration.jpg "Integration")
+
+## Domain Events as Integration Events
+* https://blogs.msdn.microsoft.com/cesardelatorre/2017/02/07/domain-events-vs-integration-events-in-domain-driven-design-and-microservices-architectures/
+* As another possible approach, when you raise a domain event, it would also be queued to a CommitedEvent Queue once the transaction was successfully finished. Then, you would have 2 types of handlers. DomainEventHandler and CommitedEventHandler.
+* You could extend any of those classes. If you need to handle the event immediately (internal domain operation), you would use a "normal" DomainEventHandler. If you need Commited data (ex: your handler relies on queries over stored data) you use a CommitedDomainEventHandler which would be pretty similar to handling an integration event.
+* At the end of the day, it is pretty similar to having domain events and integration events but using the same definition of event going through different channels depending on the state (committed vs. not committed event).
 
 ## Communication
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/communication-in-microservice-architecture
