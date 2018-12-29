@@ -20,6 +20,14 @@
 
 ![alt text](img/communication.jpg "Logical")
 
+## User Interfaces
+* https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/microservice-based-composite-ui-shape-layout
+* https://app.pluralsight.com/library/courses/micro-frontends-architecture/table-of-contents
+
+![alt text](img/monolithic-ui.jpg "Monolithic")
+
+![alt text](img/composite-ui.jpg "Composite")
+
 ## DDD
 ### Bounded Context
 * https://martinfowler.com/bliki/BoundedContext.html
