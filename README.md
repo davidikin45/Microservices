@@ -14,6 +14,8 @@
 
 ![alt text](img/vs-solution-structure.jpg "Structure")
 
+![alt text](img/full.jpg "Architecture")
+
 ## DDD
 ### Bounded Context
 * https://martinfowler.com/bliki/BoundedContext.html
