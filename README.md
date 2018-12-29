@@ -1,53 +1,70 @@
 # Microservices and Domain Driven Design
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/microservice-domain-model
+* https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/data-sovereignty-per-microservice
+* A microservices architecture is an approach to building a server application as a set of small services. That means a microservices architecture is mainly oriented to the back-end, although the approach is also being used for the front end. Each service runs in its own process and communicates with other processes using protocols such as HTTP/HTTPS, WebSockets, or AMQP. Each microservice implements a specific end-to-end domain or business capability within a certain context boundary, and each must be developed autonomously and be deployable independently. Finally, each microservice should own its related domain data model and domain logic (sovereignty and decentralized data management) and could be based on different data storage technologies (SQL, NoSQL) and different programming languages.
+* An important rule for microservices architecture is that each microservice must own its domain data and logic. Just as a full application owns its logic and data, so must each microservice own its logic and data under an autonomous lifecycle, with independent deployment per microservice.
+* Why a microservices architecture? In short, it provides long-term agility. Microservices enable better maintainability in complex, large, and highly-scalable systems by letting you create applications based on many independently deployable services that each have granular and autonomous lifecycles.
 
-# Entities
+## Logical vs physical architecture
+* a business microservice or Bounded Context is a logical architecture that might coincide (or not) with physical architecture. The important point is that a business microservice or Bounded Context must be autonomous by allowing code and state to be independently versioned, deployed, and scaled.
+* The services in the example share the same data model because the Web API service targets the same data as the Search service. So, in the physical implementation of the business microservice, you're splitting that functionality so you can scale each of those internal services up or down as needed. Maybe the Web API service usually needs more instances than the Search service, or vice versa.
+![alt text](img/logical.jpg "Logical")
+
+## DDD
+### Bounded Context
+* https://martinfowler.com/bliki/BoundedContext.html
+* DDD deals with large models by dividing them into multiple BCs and being explicit about their boundaries. Each BC must have its own model and database.
+* A microservice is therefore like a Bounded Context, but it also specifies that it's a distributed service. It's built as a separate process for each Bounded Context, and it must use the distributed protocols noted earlier, like HTTP/HTTPS, WebSockets, or AMQP. The Bounded Context pattern, however, doesn't specify whether the Bounded Context is a distributed service or if it's simply a logical boundary (such as a generic subsystem) within a monolithic-deployment application.
+
+### Entities
 ![alt text](img/entity.png "Entity")
 
-# Value Objects
+### Value Objects
 * https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities
 
 ![alt text](img/value.png "Value Object")
 
-# Aggregates
+## Aggregates
 
 ![alt text](img/aggregate.png "Aggregates")
 
-# Layers
+## Layers
 1. Application
 2. Domain
 3. Infrastructure
 
-# .NET Core Domain Model
+## .NET Core Domain Model
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/net-core-microservice-domain-model
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/seedwork-domain-model-base-classes-interfaces
 
-# Domain Events
+## Domain Events
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/domain-events-design-implementation
 * The event handlers are typically in the application layer, because you will use infrastructure objects like repositories or an application API for the microservice’s behavior. In that sense, event handlers are similar to command handlers, so both are part of the application layer. The important difference is that a command should be processed only once. A domain event could be processed zero or n times, because it can be received by multiple receivers or event handlers with a different purpose for each handler.
 
 ![alt text](img/domain-events.jpg "Domain Events")
 
-# EF Core Persistence
+## EF Core Persistence
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-implemenation-entity-framework-core
 * Repositories only for Aggregates
 * Repository’s lifetime should usually be set as scoped (InstancePerLifetimeScope in Autofac). It could also be transient (InstancePerDependency in Autofac), but your service will be more efficient in regards memory when using the scoped lifetime.
 * The Repository pattern allows you to easily test your application with unit tests. Remember that unit tests only test your code, not infrastructure, so the repository abstractions make it easier to achieve that goal.
 * it's recommended that you define and place the repository interfaces in the domain model layer so the application layer, such as your Web API microservice, doesn't depend directly on the infrastructure layer where you've implemented the actual repository classes. By doing this and using Dependency Injection in the controllers of your Web API, you can implement mock repositories that return fake data instead of data from the database. This decoupled approach allows you to create and run unit tests that focus the logic of your application without requiring connectivity to the database.
 
+![alt text](img/microservice-data.jpg "Microservice Data")
+
 ![alt text](img/data.jpg "data")
 
 ![alt text](img/repository.jpg "repository")
 
-# Mongo and Azure Cosmos
+## Mongo and Azure Cosmos
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/nosql-database-persistence-infrastructure
 
-# Validation
+## Validation
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/domain-model-layer-validations
 * It is easier to duplicate validation logic than to keep it consistent across application layers.
 * In enterprise applications it is more important not to couple the server side to the client side than to follow the DRY principle.
 
-# Application Layer
+## Application Layer
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/microservice-application-layer-web-api-design
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/microservice-application-layer-implementation-web-api
 * https://lostechies.com/jimmybogard/2008/08/21/services-in-domain-driven-design/
@@ -62,7 +79,7 @@
 
  ![alt text](img/cqrs.jpg "cqrs")
 
-# API Gateways
+## API Gateways
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/direct-client-to-microservice-communication-versus-the-api-gateway-pattern
 
 ![alt text](img/gateways.jpg "gateways")
