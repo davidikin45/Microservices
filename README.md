@@ -1,10 +1,21 @@
 # Microservices and Domain Driven Design
+* https://app.pluralsight.com/library/courses/microservices-architectural-design-patterns-playbook/table-of-contents
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/microservice-domain-model
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/data-sovereignty-per-microservice
 * https://github.com/dotnet-architecture/eShopOnContainers
 * A microservices architecture is an approach to building a server application as a set of small services. That means a microservices architecture is mainly oriented to the back-end, although the approach is also being used for the front end. Each service runs in its own process and communicates with other processes using protocols such as HTTP/HTTPS, WebSockets, or AMQP. Each microservice implements a specific end-to-end domain or business capability within a certain context boundary, and each must be developed autonomously and be deployable independently. Finally, each microservice should own its related domain data model and domain logic (sovereignty and decentralized data management) and could be based on different data storage technologies (SQL, NoSQL) and different programming languages.
 * An important rule for microservices architecture is that each microservice must own its domain data and logic. Just as a full application owns its logic and data, so must each microservice own its logic and data under an autonomous lifecycle, with independent deployment per microservice.
 * Why a microservices architecture? In short, it provides long-term agility. Microservices enable better maintainability in complex, large, and highly-scalable systems by letting you create applications based on many independently deployable services that each have granular and autonomous lifecycles.
+* Independently changeable
+* Independently deployable
+* Loosely coupled
+* Stateless
+* Pragmatic REST allows for actions/tasks using verbs instead of nouns. e.g api/customer/calculate
+
+## Designing
+* Top down approach
+* Design application layer and functions first
+* Design  bounded contexts
 
 ## Logical vs physical architecture
 * a business microservice or Bounded Context is a logical architecture that might coincide (or not) with physical architecture. The important point is that a business microservice or Bounded Context must be autonomous by allowing code and state to be independently versioned, deployed, and scaled.
@@ -13,8 +24,6 @@
 ![alt text](img/logical.jpg "Logical")
 
 ![alt text](img/vs-solution-structure.jpg "Structure")
-
-![alt text](img/full.jpg "Architecture")
 
 ## DDD
 ### Bounded Context
@@ -75,6 +84,8 @@
 
 ![alt text](img/integration.jpg "Integration")
 
+![alt text](img/broker.png "Broker")
+
 ## Communication
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/communication-in-microservice-architecture
 * If your microservice needs to raise an additional action in another microservice, if possible, do not perform that action synchronously and as part of the original microservice request and reply operation. Instead, do it asynchronously (using asynchronous messaging or integration events, queues, etc.). But, as much as possible, do not invoke the action synchronously as part of the original synchronous request and reply operation.
@@ -90,6 +101,9 @@
 * Repository’s lifetime should usually be set as scoped (InstancePerLifetimeScope in Autofac). It could also be transient (InstancePerDependency in Autofac), but your service will be more efficient in regards memory when using the scoped lifetime.
 * The Repository pattern allows you to easily test your application with unit tests. Remember that unit tests only test your code, not infrastructure, so the repository abstractions make it easier to achieve that goal.
 * it's recommended that you define and place the repository interfaces in the domain model layer so the application layer, such as your Web API microservice, doesn't depend directly on the infrastructure layer where you've implemented the actual repository classes. By doing this and using Dependency Injection in the controllers of your Web API, you can implement mock repositories that return fake data instead of data from the database. This decoupled approach allows you to create and run unit tests that focus the logic of your application without requiring connectivity to the database.
+* Eventual-Consistency rather than ACID
+* Function First Design approach over Data first to prevent just CRUD
+* Avoid shared databases. Use events instead and allow other microservices to store data locally. Push better than Pull.
 
 ![alt text](img/microservice-data.jpg "Microservice Data")
 
@@ -130,5 +144,11 @@
 
 ## API Gateways
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/direct-client-to-microservice-communication-versus-the-api-gateway-pattern
+* https://konghq.com/
+* Makes it easier for client applications
 
 ![alt text](img/gateways.jpg "gateways")
+
+![alt text](img/gateway.png "Gateway")
+
+![alt text](img/aggregator.png "Aggregator")
