@@ -1,5 +1,4 @@
 # Microservices and Domain Driven Design
-* https://app.pluralsight.com/library/courses/microservices-architectural-design-patterns-playbook/table-of-contents
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/microservice-domain-model
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/data-sovereignty-per-microservice
 * https://github.com/dotnet-architecture/eShopOnContainers
@@ -11,11 +10,14 @@
 * Loosely coupled
 * Stateless
 * Pragmatic REST allows for actions/tasks using verbs instead of nouns. e.g api/customer/calculate
+* The key characteristic of a resource-oriented API is that it emphasizes resources (data model) over the methods performed on the resources (functionality). A typical resource-oriented API exposes a large number of resources with a small number of methods. The methods can be either the standard methods or custom methods. For this guide, the standard methods are: List, Get, Create, Update, and Delete.
+Where API functionality naturally maps to one of the standard methods, that method should be used in the API design. For functionality that does not naturally map to one of the standard methods, custom methods may be used. Custom methods offer the same design freedom as traditional RPC APIs, which can be used to implement common programming patterns, such as database transactions or data analysis.
+* https://cloud.google.com/apis/design/resources
 
-## Designing
-* Top down approach
-* Design application layer and functions first
-* Design  bounded contexts
+## Pluralsight Courses
+* https://www.pluralsight.com/courses/microservices-architecture
+* https://app.pluralsight.com/library/courses/microservices-architectural-design-patterns-playbook/table-of-contents
+* https://www.pluralsight.com/courses/cqrs-in-practice
 
 ## Logical vs physical architecture
 * a business microservice or Bounded Context is a logical architecture that might coincide (or not) with physical architecture. The important point is that a business microservice or Bounded Context must be autonomous by allowing code and state to be independently versioned, deployed, and scaled.
@@ -102,8 +104,6 @@
 * The Repository pattern allows you to easily test your application with unit tests. Remember that unit tests only test your code, not infrastructure, so the repository abstractions make it easier to achieve that goal.
 * it's recommended that you define and place the repository interfaces in the domain model layer so the application layer, such as your Web API microservice, doesn't depend directly on the infrastructure layer where you've implemented the actual repository classes. By doing this and using Dependency Injection in the controllers of your Web API, you can implement mock repositories that return fake data instead of data from the database. This decoupled approach allows you to create and run unit tests that focus the logic of your application without requiring connectivity to the database.
 * Eventual-Consistency rather than ACID
-* Function First Design approach over Data first to prevent just CRUD
-* Avoid shared databases. Use events instead and allow other microservices to store data locally. Push better than Pull.
 
 ![alt text](img/microservice-data.jpg "Microservice Data")
 
@@ -144,11 +144,158 @@
 
 ## API Gateways
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/direct-client-to-microservice-communication-versus-the-api-gateway-pattern
-* https://konghq.com/
-* Makes it easier for client applications
 
 ![alt text](img/gateways.jpg "gateways")
 
-![alt text](img/gateway.png "Gateway")
-
 ![alt text](img/aggregator.png "Aggregator")
+
+## Resiliency
+* https://github.com/App-vNext/Polly
+* https://github.com/App-vNext/Polly/wiki/PolicyWrap
+* Design for known failures
+* Fail fast
+* Fallback = Defines an alternative value to be returned (or action to be executed) on failure.
+* Cache = Provides a response from cache if known.
+* Retry = Allows configuring automatic retries.
+* Circuit Breaker = Breaks the circuit (blocks executions) for a period, when faults exceed some pre-configured threshold.
+* Timeouts = Guarantees the caller won't have to wait beyond the timeout.
+* Bulkhead Isolation = Constrains the governed actions to a fixed-size resource pool, isolating their potential to affect others.
+
+![alt text](img/circuit-breaker.png "Circuit Breaker")
+
+## Backwards Compatibility - Versioning
+* Support Previous and Currenct version
+* Use consecutive integers. 
+* In the background it may use Semantic Versioning. e.g 2.0.1 (major.minor.patch)
+* Accept header, path or querystring  for request
+* Content-type for response
+* Breaking changes occur when:
+* Renaming operations/resource
+* Removing operations/resources
+* optional parameters becoming mandatory
+* Adding new validation/exceptions
+* Changing data types
+* Changing endpoints
+* Changing security
+* Changing standards (e.g using PATCH instead of PUT)
+* Allowed changes:
+* Adding operation/resource
+* Adding optional data
+* Making mandatory data optional
+* Implementing existing operation/resource
+* Redirection response codes
+* Adding additional data to payload
+* Dto <--> Entity
+![alt text](img/mapping.png "Mapping")
+
+## Testing
+* Unit Testing (Mocking)
+* Integration Testing (With database)
+* Contract Testing
+* UI Testing
+* Manual
+
+## Defining Microservice Contracts
+
+* Resource Based - Each endpoint is a resource
+* noun based
+![alt text](img/resource.png "Resource")
+
+* Action Based - Each endpoint is an action 
+* verb based
+
+* Task Based - Long Running
+![alt text](img/task.png "Task")
+
+* using Swashbuckle.AspNetCore 
+
+## Centralized Logging
+* Distributed architecture requires centralized logging
+ 
+![alt text](img/logging.png "Logging")
+
+* ElasticSearch
+* Kibana
+* Structured format for consistency (Message + Data)
+* Levels (Debug (Technical), Info, Warning, Error)
+* Date and time
+* CorrelationId for transaction transparency
+* Avoid log buffering in client apps to get a real time view
+* Host and app information
+
+## Reporting
+* Reporting on distributed data is difficult
+* Reporting Service Calls
+* Data Push Application
+* Reporting Event Subscribers
+* Reporting Events via Gateway
+* DB backup imports for Reporting
+* ETL and Data-warehouses
+
+![alt text](img/reporting.png "Reporting")
+
+![alt text](img/reporting-push.png "Reporting Push")
+
+![alt text](img/reporting-events.png "Reporting Events")
+
+![alt text](img/reporting-gateway.png "Reporting Gateway")
+
+![alt text](img/reporting-backups.png "Reporting Backups")
+
+![alt text](img/reporting-etl.png "Reporting ETL")
+
+## Automated Deployments (DevOps)
+* Azure DevOps, Jenkins
+* Continuous Integration and Deployment
+* Automated testing
+* Single Central code repository
+* small change = small risk
+
+![alt text](img/devops.png "DevOps")
+
+![alt text](img/devops2.png "DevOps2")
+
+## Infrastructure
+* Cloud built for microservices
+* Hybrid approaches
+
+![alt text](img/infrastructure.png "Infrastructure")
+
+![alt text](img/hybrid.png "Hybrid")
+
+## Configuration
+* Alot of configuration connecting microservices
+* Deployments Servers which store key/value pairs per environment
+* External Configuration Store (Azure Key Vault)
+![alt text](img/external.png "External")
+* Configuration Managements Tools (Chef, Puppet, Ansible)
+![alt text](img/chef.png "Chef")
+* Containers and Orchestration engines (Kubernates)
+* Containers are an alternative to Configuration Management tools. Should not be used together as containers should be self contained and startup quickly.
+![alt text](img/containers.png "Containers")
+
+## Registration/Discovery
+* Traditional approach of storing IP:Port doesn't really work as there could be many instances to meet demand.
+* Need for a service registration and discovery service.
+* Client Side Discovery. Clent App Manages Load Balancing by Connecting to Service Registry Database to retreieve API list. Location is registered on instance startup. Location removed on shutdown. Periodically check instance existence.
+![alt text](img/client-side.png "Client Side")
+* Server Side Discovery. Uses Load Balancer. Location is registered on instance startup. Location removed on shutdown. Periodically check instance existence.
+![alt text](img/server-side.png "Server Side")
+* Orchestration Engines (e.g Kubernates and Docker Swarm) can also handle the service registration/discovery.
+![alt text](img/registration.png "Registration")
+
+## Monitoring
+* Proactive approach and monitor real-time Dashboard (Simple, visual and minimal information, metric threshold (normal, warning, critical) --> alerts)
+* Use the same dashboard in all environments
+* Avoid non-actionable alerts which don't require them to do anything. End up ignoring actual alerts.
+* Take care defining thresholds as setting them too low creates noise. End up ignoring actual alerts.
+* Monitor Host/Infrastructure to scale when required
+* Monitor Microservice availability
+* Monitor Microservice response rate
+* Success/Failures
+* Errors, exceptions and timeouts
+* Business metrics to detect changes in behaviour
+* Monitor SLA metrics. Throughput and uptime. Average response times. Monitor third party APIs.
+* StatsD, Graphite, New Relic, PRTG, Ngaios, Azure Application Insights
+
+![alt text](img/monitoring.png "Monitoring")
