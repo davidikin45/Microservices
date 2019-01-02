@@ -13,6 +13,8 @@
 * The key characteristic of a resource-oriented API is that it emphasizes resources (data model) over the methods performed on the resources (functionality). A typical resource-oriented API exposes a large number of resources with a small number of methods. The methods can be either the standard methods or custom methods. For this guide, the standard methods are: List, Get, Create, Update, and Delete.
 Where API functionality naturally maps to one of the standard methods, that method should be used in the API design. For functionality that does not naturally map to one of the standard methods, custom methods may be used. Custom methods offer the same design freedom as traditional RPC APIs, which can be used to implement common programming patterns, such as database transactions or data analysis.
 * https://cloud.google.com/apis/design/resources
+* Greenfield = new system
+* Brownfield = Existing system
 
 ## Pluralsight Courses
 * https://www.pluralsight.com/courses/microservices-architecture
