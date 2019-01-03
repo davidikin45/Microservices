@@ -15,6 +15,7 @@ Where API functionality naturally maps to one of the standard methods, that meth
 * https://cloud.google.com/apis/design/resources
 * Greenfield = new system
 * Brownfield = Existing system
+* Ubiquitous Language
 
 ## Pluralsight Courses
 * https://www.pluralsight.com/courses/microservices-architecture
@@ -144,7 +145,7 @@ Where API functionality naturally maps to one of the standard methods, that meth
 
 ![alt text](img/composite-ui.jpg "Composite")
 
-## API Gateways
+## API Gateways/Load Balancer
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/direct-client-to-microservice-communication-versus-the-api-gateway-pattern
 
 ![alt text](img/gateways.jpg "gateways")
