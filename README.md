@@ -19,6 +19,7 @@ Where API functionality naturally maps to one of the standard methods, that meth
 * Sub-Domain is the problem = Bounded Context is the solution
 * Shared Kernel for sharing code between bounded contexts
 * Behaviours (Rich) vs Attribute (Anemic) 
+* No domain model will be perfect.
 
 ## Pluralsight Courses
 * https://www.pluralsight.com/courses/microservices-architecture
