@@ -16,6 +16,9 @@ Where API functionality naturally maps to one of the standard methods, that meth
 * Greenfield = new system
 * Brownfield = Existing system
 * Ubiquitous Language
+* Sub-Domain is the problem = Bounded Context is the solution
+* Shared Kernel for sharing code between bounded contexts
+* Behaviours (Rich) vs Attribute (Anemic) 
 
 ## Pluralsight Courses
 * https://www.pluralsight.com/courses/microservices-architecture
@@ -37,11 +40,17 @@ Where API functionality naturally maps to one of the standard methods, that meth
 * A microservice is therefore like a Bounded Context, but it also specifies that it's a distributed service. It's built as a separate process for each Bounded Context, and it must use the distributed protocols noted earlier, like HTTP/HTTPS, WebSockets, or AMQP. The Bounded Context pattern, however, doesn't specify whether the Bounded Context is a distributed service or if it's simply a logical boundary (such as a generic subsystem) within a monolithic-deployment application.
 
 ### Entities
+* Ints Ids ok for CRUD
+* GUIDs are much better for DDD
+* EF requies a default protected constructor
+* One way relationships
 ![alt text](img/entity.png "Entity")
 
 ### Value Objects
 * https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities
-
+* Immutable
+* Create a new instance 
+* Use value object over entities wherever possible
 ![alt text](img/value.png "Value Object")
 
 ## Aggregates
@@ -49,9 +58,13 @@ Where API functionality naturally maps to one of the standard methods, that meth
 ![alt text](img/aggregate.png "Aggregates")
 
 ## Layers
-1. Application
-2. Domain
-3. Infrastructure
+1. Api & Application - Cqrs
+2. Domain - Core(Interfaces) and Domain(Model) and Services(Multiple Domain Elements)
+3. Infrastructure - Data(Repositories, DbContext), Send Email, Log to a File
+4. Unit Tests
+5. Integration Tests
+6. UI Tests
+7. Shared Kernel(Model shared by two or more teams)
 
 ## Domain Model
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/net-core-microservice-domain-model
@@ -62,6 +75,7 @@ Where API functionality naturally maps to one of the standard methods, that meth
 ![alt text](img/structure.jpg "Structure")
 
 ![alt text](img/ddd-aggregate.jpg "Aggregate")
+
 
 ## Domain Events
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/domain-events-design-implementation
