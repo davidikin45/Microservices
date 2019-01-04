@@ -44,6 +44,7 @@ Where API functionality naturally maps to one of the standard methods, that meth
 * GUIDs are much better for DDD
 * EF requies a default protected constructor
 * One way relationships
+* Child entities should only have key references.
 ![alt text](img/entity.png "Entity")
 
 ### Value Objects
@@ -54,7 +55,12 @@ Where API functionality naturally maps to one of the standard methods, that meth
 ![alt text](img/value.png "Value Object")
 
 ## Aggregates
-
+* Every Aggregate has an Aggregate Root
+* If deleting aggregate root, should children also be deleted? if so it is likely an Aggregate Root.
+* A cluster of associated objects we treat as a unit for the purpose of data changes.
+* A "owns" B = Composition : B has no meaning or purpose in the system without A
+* A "uses" B = Aggregation : B exists independently (conceptually) from A
+* Only aggregate Roots can reference each other
 ![alt text](img/aggregate.png "Aggregates")
 
 ## Layers
@@ -116,8 +122,9 @@ Where API functionality naturally maps to one of the standard methods, that meth
 
 ## EF Core Persistence
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-implemenation-entity-framework-core
-* Repositories only for Aggregates
+* Repositories only for Aggregate Roots
 * Repository’s lifetime should usually be set as scoped (InstancePerLifetimeScope in Autofac). It could also be transient (InstancePerDependency in Autofac), but your service will be more efficient in regards memory when using the scoped lifetime.
+* Potentially can repository only work with IAggregateRoot.
 * The Repository pattern allows you to easily test your application with unit tests. Remember that unit tests only test your code, not infrastructure, so the repository abstractions make it easier to achieve that goal.
 * it's recommended that you define and place the repository interfaces in the domain model layer so the application layer, such as your Web API microservice, doesn't depend directly on the infrastructure layer where you've implemented the actual repository classes. By doing this and using Dependency Injection in the controllers of your Web API, you can implement mock repositories that return fake data instead of data from the database. This decoupled approach allows you to create and run unit tests that focus the logic of your application without requiring connectivity to the database.
 * Eventual-Consistency rather than ACID
