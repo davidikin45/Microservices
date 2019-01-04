@@ -2,6 +2,7 @@
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/microservice-domain-model
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/data-sovereignty-per-microservice
 * https://github.com/dotnet-architecture/eShopOnContainers
+* https://herbertograca.com/2017/11/16/explicit-architecture-01-ddd-hexagonal-onion-clean-cqrs-how-i-put-it-all-together/
 * A microservices architecture is an approach to building a server application as a set of small services. That means a microservices architecture is mainly oriented to the back-end, although the approach is also being used for the front end. Each service runs in its own process and communicates with other processes using protocols such as HTTP/HTTPS, WebSockets, or AMQP. Each microservice implements a specific end-to-end domain or business capability within a certain context boundary, and each must be developed autonomously and be deployable independently. Finally, each microservice should own its related domain data model and domain logic (sovereignty and decentralized data management) and could be based on different data storage technologies (SQL, NoSQL) and different programming languages.
 * An important rule for microservices architecture is that each microservice must own its domain data and logic. Just as a full application owns its logic and data, so must each microservice own its logic and data under an autonomous lifecycle, with independent deployment per microservice.
 * Why a microservices architecture? In short, it provides long-term agility. Microservices enable better maintainability in complex, large, and highly-scalable systems by letting you create applications based on many independently deployable services that each have granular and autonomous lifecycles.
@@ -20,6 +21,10 @@ Where API functionality naturally maps to one of the standard methods, that meth
 * Shared Kernel for sharing code between bounded contexts
 * Behaviours (Rich) vs Attribute (Anemic) 
 * No domain model will be perfect.
+
+![alt text](img/architecture.png "Architecture")
+
+![alt text](img/architecture2.png "Architecture 2")
 
 ## Pluralsight Courses
 * https://www.pluralsight.com/courses/microservices-architecture
