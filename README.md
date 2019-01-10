@@ -16,58 +16,37 @@ Where API functionality naturally maps to one of the standard methods, that meth
 * https://cloud.google.com/apis/design/resources
 * Greenfield = new system
 * Brownfield = Existing system
-* Ubiquitous Language
+* Ubiquitous Language is generally saved under source control in a document. Avoid acronyms.
+* Domain is the problem = Domain Model is the solution
 * Sub-Domain is the problem = Bounded Context is the solution
 * Shared Kernel for sharing code between bounded contexts
 * Behaviours (Rich) vs Attribute (Anemic) 
 * No domain model will be perfect.
+* Top down approach is crucial.
+* Actions change state
 
 ![alt text](img/architecture.png "Architecture")
 
 ![alt text](img/architecture2.png "Architecture 2")
+
+![alt text](img/domain.png "Model")
+
 
 ## Pluralsight Courses
 * https://www.pluralsight.com/courses/microservices-architecture
 * https://app.pluralsight.com/library/courses/microservices-architectural-design-patterns-playbook/table-of-contents
 * https://www.pluralsight.com/courses/cqrs-in-practice
 
-## Logical vs physical architecture
+## Logical vs physical architecture. Tiers vs Layers
 * a business microservice or Bounded Context is a logical architecture that might coincide (or not) with physical architecture. The important point is that a business microservice or Bounded Context must be autonomous by allowing code and state to be independently versioned, deployed, and scaled.
 * The services in the example share the same data model because the Web API service targets the same data as the Search service. So, in the physical implementation of the business microservice, you're splitting that functionality so you can scale each of those internal services up or down as needed. Maybe the Web API service usually needs more instances than the Search service, or vice versa.
+* Old 3-tier architecture was usually implemented as 2 tiers 1. Presentation + Business Layers & 2. Data
 
 ![alt text](img/logical.jpg "Logical")
 
 ![alt text](img/vs-solution-structure.jpg "Structure")
 
-## DDD
-### Bounded Context
-* https://martinfowler.com/bliki/BoundedContext.html
-* DDD deals with large models by dividing them into multiple BCs and being explicit about their boundaries. Each BC must have its own model and database.
-* A microservice is therefore like a Bounded Context, but it also specifies that it's a distributed service. It's built as a separate process for each Bounded Context, and it must use the distributed protocols noted earlier, like HTTP/HTTPS, WebSockets, or AMQP. The Bounded Context pattern, however, doesn't specify whether the Bounded Context is a distributed service or if it's simply a logical boundary (such as a generic subsystem) within a monolithic-deployment application.
-
-### Entities
-* Ints Ids ok for CRUD
-* GUIDs are much better for DDD
-* EF requies a default protected constructor
-* One way relationships
-* Child entities should only have key references.
-![alt text](img/entity.png "Entity")
-
-### Value Objects
-* https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities
-* Immutable
-* Create a new instance 
-* Use value object over entities wherever possible
-![alt text](img/value.png "Value Object")
-
-## Aggregates
-* Every Aggregate has an Aggregate Root
-* If deleting aggregate root, should children also be deleted? if so it is likely an Aggregate Root.
-* A cluster of associated objects we treat as a unit for the purpose of data changes.
-* A "owns" B = Composition : B has no meaning or purpose in the system without A
-* A "uses" B = Aggregation : B exists independently (conceptually) from A
-* Only aggregate Roots can reference each other
-![alt text](img/aggregate.png "Aggregates")
+![alt text](img/segments.png "Segments")
 
 ## Layers
 1. Api & Application - Cqrs
@@ -78,18 +57,124 @@ Where API functionality naturally maps to one of the standard methods, that meth
 6. UI Tests
 7. Shared Kernel(Model shared by two or more teams)
 
-## Domain Model
+![alt text](img/layers.png "Layers")
+
+ ## Presentation Layer - User Interfaces
+* https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/microservice-based-composite-ui-shape-layout
+* https://app.pluralsight.com/library/courses/micro-frontends-architecture/table-of-contents
+
+![alt text](img/monolithic-ui.jpg "Monolithic")
+
+![alt text](img/composite-ui.jpg "Composite")
+
+## Application Layer
+* https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/microservice-application-layer-web-api-design
+* https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/microservice-application-layer-implementation-web-api
+* https://lostechies.com/jimmybogard/2008/08/21/services-in-domain-driven-design/
+* The application layer can be implemented as part of the artifact (assembly) you are building, such as within a Web API project or an MVC web app project. In the case of a microservice built with ASP.NET Core, the application layer will usually be your Web API library. If you want to separate what is coming from ASP.NET Core (its infrastructure plus your controllers) from your custom application layer code, you could also place your application layer in a separate class library, but that is optional.
+* An important characteristic of a command is that it should be processed just once by a single receiver. This is because a command is a single action or transaction you want to perform in the application. For example, the same order creation command should not be processed more than once. This is an important difference between commands and events. Events may be processed multiple times, because many systems or microservices might be interested in the event.
+* Some developers make their UI request objects separate from their command DTOs, but that is just a matter of preference. It is a tedious separation with not much added value, and the objects are almost exactly the same shape.
+* You send a command to a single receiver; you do not publish a command. Publishing is for events that state a fact—that something has happened and might be interesting for event receivers. In the case of events, the publisher has no concerns about which receivers get the event or what they do it. But domain or integration events are a different story already introduced in previous sections.
+* A mediator is an object that encapsulates the “how” of this process: it coordinates execution based on state, the way a command handler is invoked, or the payload you provide to the handler. With a mediator component you can apply cross-cutting concerns in a centralized and transparent way by applying decorators (or pipeline behaviors since MediatR 3). For more information, see the Decorator pattern.
+* Decorators and behaviors are similar to Aspect Oriented Programming (AOP), only applied to a specific process pipeline managed by the mediator component. Aspects in AOP that implement cross-cutting concerns are applied based on aspect weavers injected at compilation time or based on object call interception. Both typical AOP approaches are sometimes said to work "like magic," because it is not easy to see how AOP does its work. When dealing with serious issues or bugs, AOP can be difficult to debug. On the other hand, these decorators/behaviors are explicit and applied only in the context of the mediator, so debugging is much more predictable and easy.
+* Reports ready-to-use data in the correct form
+* Use cases of the application frontend
+* Possibly extended or rewritten for each new frontend
+* Includes all busisness logic variant to use-cases
+
+```
+public class HomeController
+{
+    private readonly IHomeApplicationService _service;
+    public HomeController(IHomeApplicationService service)
+    {
+        _service = service;
+    }
+
+    public ActionResult Index()
+    {
+        var model = _service.FillHomePage(inoutModel);
+        return View(model);
+    }
+}
+```
+
+ ![alt text](img/application.jpg "application")
+
+ ![alt text](img/cqrs.jpg "cqrs")
+
+## Domain Layer - Domain Model - DDD
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/net-core-microservice-domain-model
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/seedwork-domain-model-base-classes-interfaces
 *  Each aggregate is a group of domain entities and value objects, although you could have an aggregate composed of a single domain entity (the aggregate root or root entity) as well.
 *  The domain model layer includes the repository contracts (interfaces) that are the infrastructure requirements of your domain model. In other words, these interfaces express what repositories and the methods the infrastructure layer must implement. It is critical that the implementation of the repositories be placed outside of the domain model layer, in the infrastructure layer library, so the domain model layer is not “contaminated” by API or classes from infrastructure technologies, like Entity Framework.
+* Alternative patterns for encapsulating business logic are Tx Script and Table Module.
+* Includes all busisness logic invariant to use-cases
+* Use factories
+* Private setters
+* Data + Behavior
+* Prioritise Actions over Data
 
 ![alt text](img/structure.jpg "Structure")
 
 ![alt text](img/ddd-aggregate.jpg "Aggregate")
 
+### Bounded Context
+* https://martinfowler.com/bliki/BoundedContext.html
+* DDD deals with large models by dividing them into multiple BCs and being explicit about their boundaries. Each BC must have its own model and database.
+* A microservice is therefore like a Bounded Context, but it also specifies that it's a distributed service. It's built as a separate process for each Bounded Context, and it must use the distributed protocols noted earlier, like HTTP/HTTPS, WebSockets, or AMQP. The Bounded Context pattern, however, doesn't specify whether the Bounded Context is a distributed service or if it's simply a logical boundary (such as a generic subsystem) within a monolithic-deployment application.
 
-## Domain Events
+### Entities
+* Ints Ids ok for CRUD
+* GUIDs are much better for DDD
+* EF requies a default protected constructor
+* One way relationships
+* Child entities should only have key references to other Aggregate roots
+* Good idea to have a static factory class in each entity
+
+```
+public class Entity{
+    public static class Factory{
+        public state Entity CreateNew()
+        {
+
+        }
+    }
+}
+```
+
+
+![alt text](img/entity.png "Entity")
+
+### Value Objects
+* https://docs.microsoft.com/en-us/ef/core/modeling/owned-entities
+* Immutable
+* Create a new instance 
+* Use value object over entities wherever possible
+
+![alt text](img/value.png "Value Object")
+
+### Aggregates
+* Every Aggregate has an Aggregate Root
+* If deleting aggregate root, should children also be deleted? if so it is likely an Aggregate Root.
+* A cluster of associated objects we treat as a unit for the purpose of data changes.
+* A "owns" B = Composition : B has no meaning or purpose in the system without A
+* A "uses" B = Aggregation : B exists independently (conceptually) from A
+* Only aggregate Roots can reference each other
+* Repository per Aggregate Root
+
+![alt text](img/aggregate.png "Aggregates")
+
+## Domain Layer - Domain Services
+* Pieces of domain logic that don't fit into any existing entities
+* Group logic that operates on multiple domain entities
+* Implementation process that require persistance layer for reads/writes.
+* Require access to external services.
+* exampleL BookingDomainService
+* Repository is most popular domain service
+
+
+## Domain Layer - Domain Events
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/domain-events-design-implementation
 * The event handlers are typically in the application layer, because you will use infrastructure objects like repositories or an application API for the microservice’s behavior. In that sense, event handlers are similar to command handlers, so both are part of the application layer. The important difference is that a command should be processed only once. A domain event could be processed zero or n times, because it can be received by multiple receivers or event handlers with a different purpose for each handler.
 * The domain events and their side effects (the actions triggered afterwards that are managed by event handlers) should occur almost immediately, usually in-process, and within the same domain. Thus, domain events could be synchronous or asynchronous. Integration events, however, should always be asynchronous.
@@ -102,7 +187,7 @@ Where API functionality naturally maps to one of the standard methods, that meth
 ![alt text](img/dispatcher.jpg "Dispatcher")
 
 
-## Integration Events vs Domain Events
+## Domain Layer - Integration Events vs Domain Events
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/multi-container-microservice-net-applications/integration-event-based-microservice-communications
 * Semantically, domain and integration events are the same thing: notifications about something that just happened. However, their implementation must be different. Domain events are just messages pushed to a domain event dispatcher, which could be implemented as an in-memory mediator based on an IoC container or any other method.
 * On the other hand, the purpose of integration events is to propagate committed transactions and updates to additional subsystems, whether they are other microservices, Bounded Contexts or even external applications. Hence, they should occur only if the entity is successfully persisted, otherwise it's as if the entire operation never happened.
@@ -117,7 +202,7 @@ Where API functionality naturally maps to one of the standard methods, that meth
 
 ![alt text](img/broker.png "Broker")
 
-## Communication
+## Domain Layer - Communication
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/communication-in-microservice-architecture
 * If your microservice needs to raise an additional action in another microservice, if possible, do not perform that action synchronously and as part of the original microservice request and reply operation. Instead, do it asynchronously (using asynchronous messaging or integration events, queues, etc.). But, as much as possible, do not invoke the action synchronously as part of the original synchronous request and reply operation.
 * And finally (and this is where most of the issues arise when building microservices), if your initial microservice needs data that's originally owned by other microservices, do not rely on making synchronous requests for that data. Instead, replicate or propagate that data (only the attributes you need) into the initial service's database by using eventual consistency (typically by using integration events, as explained in upcoming sections).
@@ -126,7 +211,7 @@ Where API functionality naturally maps to one of the standard methods, that meth
 
 ![alt text](img/communication.jpg "Communication")
 
-## EF Core Persistence
+## Infrastructure Layer - EF Core Persistence
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-implemenation-entity-framework-core
 * Repositories only for Aggregate Roots
 * Repository’s lifetime should usually be set as scoped (InstancePerLifetimeScope in Autofac). It could also be transient (InstancePerDependency in Autofac), but your service will be more efficient in regards memory when using the scoped lifetime.
@@ -141,36 +226,13 @@ Where API functionality naturally maps to one of the standard methods, that meth
 
 ![alt text](img/repository.jpg "repository")
 
-## Mongo and Azure Cosmos
+## Infrastructure Layer - Mongo and Azure Cosmos
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/nosql-database-persistence-infrastructure
 
-## Validation
+## Infrastructure Layer - Validation
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/domain-model-layer-validations
 * It is easier to duplicate validation logic than to keep it consistent across application layers.
 * In enterprise applications it is more important not to couple the server side to the client side than to follow the DRY principle.
-
-## Application Layer
-* https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/microservice-application-layer-web-api-design
-* https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/microservice-application-layer-implementation-web-api
-* https://lostechies.com/jimmybogard/2008/08/21/services-in-domain-driven-design/
-* The application layer can be implemented as part of the artifact (assembly) you are building, such as within a Web API project or an MVC web app project. In the case of a microservice built with ASP.NET Core, the application layer will usually be your Web API library. If you want to separate what is coming from ASP.NET Core (its infrastructure plus your controllers) from your custom application layer code, you could also place your application layer in a separate class library, but that is optional.
-* An important characteristic of a command is that it should be processed just once by a single receiver. This is because a command is a single action or transaction you want to perform in the application. For example, the same order creation command should not be processed more than once. This is an important difference between commands and events. Events may be processed multiple times, because many systems or microservices might be interested in the event.
-* Some developers make their UI request objects separate from their command DTOs, but that is just a matter of preference. It is a tedious separation with not much added value, and the objects are almost exactly the same shape.
-* You send a command to a single receiver; you do not publish a command. Publishing is for events that state a fact—that something has happened and might be interesting for event receivers. In the case of events, the publisher has no concerns about which receivers get the event or what they do it. But domain or integration events are a different story already introduced in previous sections.
-* A mediator is an object that encapsulates the “how” of this process: it coordinates execution based on state, the way a command handler is invoked, or the payload you provide to the handler. With a mediator component you can apply cross-cutting concerns in a centralized and transparent way by applying decorators (or pipeline behaviors since MediatR 3). For more information, see the Decorator pattern.
-* Decorators and behaviors are similar to Aspect Oriented Programming (AOP), only applied to a specific process pipeline managed by the mediator component. Aspects in AOP that implement cross-cutting concerns are applied based on aspect weavers injected at compilation time or based on object call interception. Both typical AOP approaches are sometimes said to work "like magic," because it is not easy to see how AOP does its work. When dealing with serious issues or bugs, AOP can be difficult to debug. On the other hand, these decorators/behaviors are explicit and applied only in the context of the mediator, so debugging is much more predictable and easy.
-
- ![alt text](img/application.jpg "application")
-
- ![alt text](img/cqrs.jpg "cqrs")
-
- ## User Interfaces
-* https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/microservice-based-composite-ui-shape-layout
-* https://app.pluralsight.com/library/courses/micro-frontends-architecture/table-of-contents
-
-![alt text](img/monolithic-ui.jpg "Monolithic")
-
-![alt text](img/composite-ui.jpg "Composite")
 
 ## API Gateways/Load Balancer
 * https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/direct-client-to-microservice-communication-versus-the-api-gateway-pattern
